@@ -22,7 +22,7 @@ namespace analoguewatch
     public class NFLWatch : CanvasWatchFaceService 
     {
 
-        const string Tag = "AnalogWatchFaceService";
+        const string Tag = "AnalogNFLWatchFaceService";
 
         /**
         * Update rate in milliseconds for interactive mode. We update once a second to advance the
@@ -36,10 +36,11 @@ namespace analoguewatch
 
         private class NFLWatchEngine:CanvasWatchFaceService.Engine
         {
-           const int MsgUpdateTime = 0;
+            const int MsgUpdateTime = 0;
+            // base class object
+			CanvasWatchFaceService NFLWatchService;
 
-			CanvasWatchFaceService owner;
-
+            //Initiliase Analogue niddles 
 			Paint hourPaint;
 			Paint minutePaint;
 			Paint secondPaint;
@@ -47,6 +48,7 @@ namespace analoguewatch
 			bool mute;
 			Time time;
 
+            //used for get currenttime
 			Timer timerSeconds;
 			TimeZoneReceiver timeZoneReceiver;
 			bool registeredTimezoneReceiver = false;
@@ -58,15 +60,15 @@ namespace analoguewatch
 			Bitmap backgroundBitmap;
 			Bitmap backgroundScaledBitmap;
 
-            public NFLWatchEngine(CanvasWatchFaceService owner)
-                : base(owner)
+            public NFLWatchEngine(CanvasWatchFaceService NFLWatchService)
+                : base(NFLWatchService)
 			{
-				this.owner = owner;
+				this.NFLWatchService = NFLWatchService;
 			}
 
 			public override void OnCreate (ISurfaceHolder surfaceHolder)
 			{
-				this.SetWatchFaceStyle (new WatchFaceStyle.Builder (this.owner)
+				this.SetWatchFaceStyle (new WatchFaceStyle.Builder (this.NFLWatchService)
 					.SetCardPeekMode (WatchFaceStyle.PeekModeShort)
 					.SetBackgroundVisibility (WatchFaceStyle.BackgroundVisibilityInterruptive)
 					.SetShowSystemUiTime (false)
@@ -74,27 +76,33 @@ namespace analoguewatch
 				);
 				base.OnCreate (surfaceHolder);
 
-				var backgroundDrawable = owner.Resources.GetDrawable (Resource.Drawable.sea);
+                // Define backgroundImage in analogue surface - Here you can give your custom background image from resource.
+                //Eventually you can update it from datamap or configuration setting
+				var backgroundDrawable = NFLWatchService.Resources.GetDrawable (Resource.Drawable.sea);
 				backgroundBitmap = (backgroundDrawable as BitmapDrawable).Bitmap;
 
+                //Draw hour niddle
 				hourPaint = new Paint ();
                 hourPaint.SetARGB(255, 123, 195, 66);
 				hourPaint.StrokeWidth = 5.0f;
 				hourPaint.AntiAlias = true;
 				hourPaint.StrokeCap = Paint.Cap.Round;
 
+                //Draw minute Niddle
 				minutePaint = new Paint ();
                 minutePaint.SetARGB(255, 123, 195, 66);
 				minutePaint.StrokeWidth = 3.0f;
 				minutePaint.AntiAlias = true;
 				minutePaint.StrokeCap = Paint.Cap.Round;
 
+                // Draw second niddle
 				secondPaint = new Paint ();
 				secondPaint.SetARGB (255, 255, 0, 0);
 				secondPaint.StrokeWidth = 2.0f;
 				secondPaint.AntiAlias = true;
 				secondPaint.StrokeCap = Paint.Cap.Round;
 
+                // Draw dial
 				tickPaint = new Paint ();
                 tickPaint.SetARGB(255, 123, 195, 66);
 				tickPaint.StrokeWidth = 3.0f;
@@ -154,6 +162,7 @@ namespace analoguewatch
 				}
 			}
 
+            //Actual Draw of analogue niddle in Canvas which will show in watch surface
 			public override void OnDraw (Canvas canvas, Rect bounds)
 			{
 				time.SetToNow ();
