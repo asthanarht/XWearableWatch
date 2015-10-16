@@ -22,7 +22,7 @@ namespace analoguewatch
     public class NFLWatch : CanvasWatchFaceService 
     {
 
-        const string Tag = "AnalogNFLWatchFaceService";
+        const string Tag = "AnalogWatchFaceService";
 
         /**
         * Update rate in milliseconds for interactive mode. We update once a second to advance the
